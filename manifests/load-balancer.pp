@@ -377,7 +377,32 @@ class openstack-ha::load-balancer(
     options           => 'check inter 2000 rise 2 fall 5',
   }
 
+
+exec {'restart-keystone':
+  command => '/usr/sbin/service keystone restart',
+}
+
+exec {'restart-glance':
+  command => '/usr/sbin/service glance restart',
+}
+
+exec {'restart-glance-reg':
+  command => '/usr/sbin/service glance-registry restart',
+}
+
+exec {'restart-cinder':
+  command => '/usr/sbin/service cinder-api restart',
+}
+
+exec {'restart-novnc':
+  command => '/usr/sbin/service nova-novncproxy restart',
+}
+
+exec {'stop-apache':
+  command => '/usr/sbin/service apache stop',
+}
 service { "haproxy":
+  before => [Exec['restart-keystone'],Exec['restart-glance'],Exec['restart-glance-reg'],Exec['restart-cinder'],Exec['restart-novnc'],Exec['stop-apache']],
   ensure => running, 
   require => Package['haproxy']
 }
