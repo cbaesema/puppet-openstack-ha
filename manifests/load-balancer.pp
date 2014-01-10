@@ -378,33 +378,46 @@ class openstack-ha::load-balancer(
   }
 
 
-exec {'restart-keystone':
-  command => '/usr/sbin/service keystone restart',
-}
+  exec {'restart-keystone':
+    command   => '/usr/sbin/service keystone restart',
+    subscribe => File['/etc/haproxy/haproxy.cfg'],
+    refreshonly => true
+  }
 
-exec {'restart-glance':
-  command => '/usr/sbin/service glance-api restart',
-}
+  exec {'restart-glance':
+    command => '/usr/sbin/service glance-api restart',
+    subscribe => File['/etc/haproxy/haproxy.cfg'],
+    refreshonly => true
+  }
 
-exec {'restart-glance-reg':
-  command => '/usr/sbin/service glance-registry restart',
-}
+  exec {'restart-glance-reg':
+    command => '/usr/sbin/service glance-registry restart',
+    subscribe => File['/etc/haproxy/haproxy.cfg'],
+    refreshonly => true
+  }
 
-exec {'restart-cinder':
-  command => '/usr/sbin/service cinder-api restart',
-}
+  exec {'restart-cinder':
+    command => '/usr/sbin/service cinder-api restart',
+    subscribe => File['/etc/haproxy/haproxy.cfg'],
+    refreshonly => true
+  }
 
-exec {'restart-novnc':
-  command => '/usr/sbin/service nova-novncproxy restart',
-}
+  exec {'restart-novnc':
+    command => '/usr/sbin/service nova-novncproxy restart',
+    subscribe => File['/etc/haproxy/haproxy.cfg'],
+    refreshonly => true
+  }
 
-exec {'stop-apache':
-  command => '/usr/sbin/service apache2 stop',
-}
-service { "haproxy":
-  ensure => running, 
-  require => Package['haproxy']
-}
+  exec {'stop-apache':
+    command => '/usr/sbin/service apache2 stop',
+    subscribe => File['/etc/haproxy/haproxy.cfg'],
+    refreshonly => true
+  }
+
+  service { "haproxy":
+    ensure => running, 
+    require => Package['haproxy']
+  }
 
 }
 
