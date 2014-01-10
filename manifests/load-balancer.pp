@@ -402,7 +402,7 @@ exec {'stop-apache':
   command => '/usr/sbin/service apache stop',
 }
 service { "haproxy":
-  before => [Exec['restart-keystone'],Exec['restart-glance'],Exec['restart-glance-reg'],Exec['restart-cinder'],Exec['restart-novnc'],Exec['stop-apache']],
+  subscribe => [Exec['restart-keystone'],Exec['restart-glance'],Exec['restart-glance-reg'],Exec['restart-cinder'],Exec['restart-novnc'],Exec['stop-apache']],
   ensure => running, 
   require => Package['haproxy']
 }
