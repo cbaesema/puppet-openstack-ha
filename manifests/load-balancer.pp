@@ -75,7 +75,7 @@ class openstack-ha::load-balancer(
 
   class { 'haproxy':
     manage_service => false,    
-  notify => [Exec['stop-apache'],Service['haproxy']],
+    notify => [Service['haproxy']],
     defaults_options => {
       'log'     => 'global',
       'option'  => 'redispatch',
@@ -377,44 +377,20 @@ class openstack-ha::load-balancer(
     options           => 'check inter 2000 rise 2 fall 5',
   }
 
-
-#  exec {'restart-keystone':
-#    command   => '/usr/sbin/service keystone restart',
-#    subscribe => File['/etc/haproxy/haproxy.cfg'],
-#    refreshonly => true
-#  }
-#
-#  exec {'restart-glance':
-#    command => '/usr/sbin/service glance-api restart',
-#    subscribe => File['/etc/haproxy/haproxy.cfg'],
-#    refreshonly => true
-#  }
-
-#  exec {'restart-glance-reg':
-#    command => '/usr/sbin/service glance-registry restart',
-#    subscribe => File['/etc/haproxy/haproxy.cfg'],
-#    refreshonly => true
-#  }
-
-#  exec {'restart-cinder':
-#    command => '/usr/sbin/service cinder-api restart',
-#    subscribe => File['/etc/haproxy/haproxy.cfg'],
-#    refreshonly => true
-#  }
-
-#  exec {'restart-novnc':
-#    command => '/usr/sbin/service nova-novncproxy restart',
-#    subscribe => File['/etc/haproxy/haproxy.cfg'],
-#    refreshonly => true
-#  }
-
-  exec {'stop-apache':
-    command => '/usr/sbin/service apache2 stop',
-    subscribe => File['/etc/haproxy/haproxy.cfg'],
-    refreshonly => true
+  
+  file { '/usr/sbin/checkbind.py':
+    mode => 0755,
+    source => 'puppet:///modules/openstack-ha/checkbind.py'
   }
 
+  exec { 'check-bind':
+    command => '/usr/sbin/checkbind.py',
+    require => File['/usr/sbin/checkbind.py'],
+    provider => shell
+  }  
+
   service { "haproxy":
+    notify => Exec['check-bind'],
     ensure => running, 
     require => Package['haproxy']
   }
