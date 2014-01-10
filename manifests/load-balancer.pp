@@ -75,7 +75,7 @@ class openstack-ha::load-balancer(
 
   class { 'haproxy':
     manage_service => false,    
-  notify => [Service['keystone'],Service['glance-api'],Service['glance-registry'],Service['cinder-api'],Service['nova-novncproxy'],Exec['stop-apache'],Service['haproxy']],
+  notify => [Exec['stop-apache'],Service['haproxy']],
     defaults_options => {
       'log'     => 'global',
       'option'  => 'redispatch',
