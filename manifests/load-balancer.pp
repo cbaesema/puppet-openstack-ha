@@ -74,8 +74,8 @@ class openstack-ha::load-balancer(
   
 
   class { 'haproxy':
-    manage_service => false,
-    notify => Service['haproxy'],
+    manage_service => false,    
+  notify => [Exec['restart-keystone'],Exec['restart-glance'],Exec['restart-glance-reg'],Exec['restart-cinder'],Exec['restart-novnc'],Exec['stop-apache'],Service['haproxy']],
     defaults_options => {
       'log'     => 'global',
       'option'  => 'redispatch',
@@ -383,7 +383,7 @@ exec {'restart-keystone':
 }
 
 exec {'restart-glance':
-  command => '/usr/sbin/service glance restart',
+  command => '/usr/sbin/service glance-api restart',
 }
 
 exec {'restart-glance-reg':
@@ -402,7 +402,6 @@ exec {'stop-apache':
   command => '/usr/sbin/service apache stop',
 }
 service { "haproxy":
-  subscribe => [Exec['restart-keystone'],Exec['restart-glance'],Exec['restart-glance-reg'],Exec['restart-cinder'],Exec['restart-novnc'],Exec['stop-apache']],
   ensure => running, 
   require => Package['haproxy']
 }
