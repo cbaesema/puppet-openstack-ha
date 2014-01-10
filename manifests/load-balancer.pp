@@ -399,7 +399,7 @@ exec {'restart-novnc':
 }
 
 exec {'stop-apache':
-  command => '/usr/sbin/service apache stop',
+  command => '/usr/sbin/service apache2 stop',
 }
 service { "haproxy":
   ensure => running, 
