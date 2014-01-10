@@ -71,7 +71,10 @@ class openstack-ha::load-balancer(
     name_is_process   => true,
   }
 
+  
+
   class { 'haproxy':
+    manage_service => false,
     defaults_options => {
       'log'     => 'global',
       'option'  => 'redispatch',
@@ -372,4 +375,13 @@ class openstack-ha::load-balancer(
     ipaddresses       => $swift_proxy_ipaddresses,
     options           => 'check inter 2000 rise 2 fall 5',
   }
+
+service { "haproxy":
+  ensure => running, 
+  require => Class['haproxy'],
+  notify => [Service['keystone'],Service['nova-novncproxy'],Service['glance-api'],Service['cinder-api'],Service['glance-registry']]
 }
+
+}
+
+
